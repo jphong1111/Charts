@@ -349,7 +349,8 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             for barRect in buffer where viewPortHandler.isInBoundsLeft(barRect.origin.x + barRect.size.width)
             {
                 guard viewPortHandler.isInBoundsRight(barRect.origin.x) else { break }
-                let bezierPath = UIBezierPath(roundedRect: barRect, cornerRadius: barRect.width * dataSet.barCornerRadiusFactor)
+                let cornerRadius = barRect.width * dataSet.barCornerRadiusFactor
+                let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
                 context.addPath(bezierPath.cgPath)
                 context.drawPath(using: .fill)
             }
@@ -379,7 +380,6 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 context.setFillColor(dataSet.color(atIndex: j).cgColor)
             }
             let cornerRadius = barRect.width * dataSet.barCornerRadiusFactor
-            
             let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
             context.addPath(bezierPath.cgPath)
             context.drawPath(using: .fill)
@@ -746,7 +746,8 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 prepareBarHighlight(x: e.x, y1: y1, y2: y2, barWidthHalf: barData.barWidth / 2.0, trans: trans, rect: &barRect)
                 
                 setHighlightDrawPos(highlight: high, barRect: barRect)
-                let bezierPath = UIBezierPath(roundedRect: barRect, cornerRadius: barRect.width * set.barCornerRadiusFactor)
+                let cornerRadius = barRect.width
+                let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
                 context.addPath(bezierPath.cgPath)
                 context.drawPath(using: .fill)
             }
