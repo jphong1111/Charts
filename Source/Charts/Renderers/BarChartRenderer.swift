@@ -349,7 +349,6 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             for barRect in buffer where viewPortHandler.isInBoundsLeft(barRect.origin.x + barRect.size.width)
             {
                 guard viewPortHandler.isInBoundsRight(barRect.origin.x) else { break }
-                
                 let bezierPath = UIBezierPath(roundedRect: barRect, cornerRadius: barRect.width * dataSet.barCornerRadiusFactor)
                 context.addPath(bezierPath.cgPath)
                 context.drawPath(using: .fill)
@@ -379,52 +378,35 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
                 context.setFillColor(dataSet.color(atIndex: j).cgColor)
             }
-
-            let cornerRadius = min(barRect.width / 2, barRect.height / 2)  // Ensure radius doesn't exceed half height
-            let bezierPath = UIBezierPath()
-
-            // Move to bottom-left (sharp corner)
-            bezierPath.move(to: CGPoint(x: barRect.minX, y: barRect.maxY))
-            bezierPath.addLine(to: CGPoint(x: barRect.minX, y: barRect.minY + cornerRadius))
-
-            // Add top-left corner arc
-            bezierPath.addArc(
-                withCenter: CGPoint(x: barRect.minX + cornerRadius, y: barRect.minY + cornerRadius),
-                radius: cornerRadius,
-                startAngle: CGFloat.pi,
-                endAngle: CGFloat.pi * 1.5,
-                clockwise: true
-            )
-
-            // Draw top side
-            bezierPath.addLine(to: CGPoint(x: barRect.maxX - cornerRadius, y: barRect.minY))
-
-            // Add top-right corner arc
-            bezierPath.addArc(
-                withCenter: CGPoint(x: barRect.maxX - cornerRadius, y: barRect.minY + cornerRadius),
-                radius: cornerRadius,
-                startAngle: CGFloat.pi * 1.5,
-                endAngle: 0,
-                clockwise: true
-            )
-
-            // Move down to bottom-right (sharp corner)
-            bezierPath.addLine(to: CGPoint(x: barRect.maxX, y: barRect.maxY))
-
-            // Close the path
-            bezierPath.close()
-
+            let cornerRadius = barRect.width * dataSet.barCornerRadiusFactor
+            
+            let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
             context.addPath(bezierPath.cgPath)
             context.drawPath(using: .fill)
-
+            
             if drawBorder
             {
                 context.setStrokeColor(borderColor.cgColor)
                 context.setLineWidth(borderWidth)
                 context.stroke(barRect)
             }
-        }
 
+            // Create and append the corresponding accessibility element to accessibilityOrderedElements
+            if let chart = dataProvider as? BarChartView
+            {
+                let element = createAccessibleElement(
+                    withIndex: j,
+                    container: chart,
+                    dataSet: dataSet,
+                    dataSetIndex: index,
+                    stackSize: stackSize
+                ) { (element) in
+                    element.accessibilityFrame = barRect
+                }
+
+                accessibilityOrderedElements[j/stackSize].append(element)
+            }
+        }
     }
     
     open func prepareBarHighlight(
@@ -764,7 +746,6 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 prepareBarHighlight(x: e.x, y1: y1, y2: y2, barWidthHalf: barData.barWidth / 2.0, trans: trans, rect: &barRect)
                 
                 setHighlightDrawPos(highlight: high, barRect: barRect)
-                
                 let bezierPath = UIBezierPath(roundedRect: barRect, cornerRadius: barRect.width * set.barCornerRadiusFactor)
                 context.addPath(bezierPath.cgPath)
                 context.drawPath(using: .fill)
