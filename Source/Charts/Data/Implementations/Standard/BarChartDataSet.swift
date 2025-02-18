@@ -120,6 +120,9 @@ open class BarChartDataSet: BarLineScatterCandleBubbleChartDataSet, BarChartData
     /// the value should create a radius in barchart. (0.0 no corner radius)
     open var barCornerRadiusFactor: CGFloat = 0.0
 
+    // The value for set coner radius only applies for top
+    open var barTopCornerRadius: Bool = false
+    
     /// the color drawing borders around the bars.
     open var barBorderColor = NSUIColor.black
 

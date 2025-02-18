@@ -37,6 +37,8 @@ public protocol BarChartDataSetProtocol: BarLineScatterCandleBubbleChartDataSetP
     /// the percentage of corner radius for each bar in chart
     var barCornerRadiusFactor: CGFloat { get set }
 
+    var barTopCornerRadius: Bool { get set }
+    
     /// the alpha value (transparency) that is used for drawing the highlight indicator bar. min = 0.0 (fully transparent), max = 1.0 (fully opaque)
     var highlightAlpha: CGFloat { get set }
     

@@ -349,10 +349,18 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             for barRect in buffer where viewPortHandler.isInBoundsLeft(barRect.origin.x + barRect.size.width)
             {
                 guard viewPortHandler.isInBoundsRight(barRect.origin.x) else { break }
-                let cornerRadius = barRect.width * dataSet.barCornerRadiusFactor
-                let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
-                context.addPath(bezierPath.cgPath)
-                context.drawPath(using: .fill)
+                
+                if dataSet.barTopCornerRadius {
+                    //Note: This is for top corner radius
+                    let cornerRadius = barRect.width * dataSet.barCornerRadiusFactor
+                    let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
+                    context.addPath(bezierPath.cgPath)
+                    context.drawPath(using: .fill)
+                } else {
+                    let bezierPath = UIBezierPath(roundedRect: barRect, cornerRadius: barRect.width * dataSet.barCornerRadiusFactor)
+                    context.addPath(bezierPath.cgPath)
+                    context.drawPath(using: .fill)
+                }
             }
         }
         
@@ -379,10 +387,17 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
                 context.setFillColor(dataSet.color(atIndex: j).cgColor)
             }
-            let cornerRadius = barRect.width * dataSet.barCornerRadiusFactor
-            let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
-            context.addPath(bezierPath.cgPath)
-            context.drawPath(using: .fill)
+            //Note: This is for top corner radius
+            if dataSet.barTopCornerRadius {
+                let cornerRadius = barRect.width * dataSet.barCornerRadiusFactor
+                let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
+                context.addPath(bezierPath.cgPath)
+                context.drawPath(using: .fill)
+            } else {
+                let bezierPath = UIBezierPath(roundedRect: barRect, cornerRadius: barRect.width * dataSet.barCornerRadiusFactor)
+                context.addPath(bezierPath.cgPath)
+                context.drawPath(using: .fill)
+            }
             
             if drawBorder
             {
@@ -746,10 +761,17 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 prepareBarHighlight(x: e.x, y1: y1, y2: y2, barWidthHalf: barData.barWidth / 2.0, trans: trans, rect: &barRect)
                 
                 setHighlightDrawPos(highlight: high, barRect: barRect)
-                let cornerRadius = barRect.width
-                let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
-                context.addPath(bezierPath.cgPath)
-                context.drawPath(using: .fill)
+                //Note: This is for top corner radius
+                if set.barTopCornerRadius {
+                    let cornerRadius = barRect.width
+                    let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
+                    context.addPath(bezierPath.cgPath)
+                    context.drawPath(using: .fill)
+                } else {
+                    let bezierPath = UIBezierPath(roundedRect: barRect, cornerRadius: barRect.width * set.barCornerRadiusFactor)
+                    context.addPath(bezierPath.cgPath)
+                    context.drawPath(using: .fill)
+                }
             }
         }
     }
